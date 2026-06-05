@@ -1,4 +1,4 @@
-import { Router, Response, Request } from 'express';
+import { Router, Response } from 'express';
 import { db } from '../db';
 import { cards, boardMembers, cardActivity } from '../db/schema';
 import { eq, and, isNull } from 'drizzle-orm';
