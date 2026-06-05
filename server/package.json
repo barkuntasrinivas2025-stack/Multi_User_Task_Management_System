@@ -1,4 +1,11 @@
 {
+  "scripts": {
+  "dev": "tsx watch src/index.ts",
+  "build": "tsc",
+  "start": "node dist/index.js",
+  "db:push": "drizzle-kit push",
+  "db:studio": "drizzle-kit studio"
+},
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
     "@types/bcryptjs": "^2.4.6",
@@ -20,4 +27,5 @@
     "drizzle-kit": "^0.21.4",
     "tsx": "^4.7.3"
   }
+  
 }
