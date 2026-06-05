@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from './shared/hooks/useAuth';
 import { AuthPage } from './features/auth/components/AuthPage';
 import { BoardsPage } from './features/boards/components/BoardsPage';

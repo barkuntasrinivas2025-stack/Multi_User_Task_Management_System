@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import type { Board } from './BoardsPage';
+import { io as socketIO } from 'socket.io-client';
+import { useRef } from 'react';
 
 interface Card {
   id: string;
@@ -31,13 +33,41 @@ const PRIORITY_COLORS = {
   high:   'bg-red-100 text-red-600',
 };
 
-export function BoardView({ board, currentUserId }: BoardViewProps) {
+export function BoardView({ board, currentUserId: _currentUserId }: BoardViewProps) {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [newCardTitle, setNewCardTitle] = useState('');
   const [newCardPriority, setNewCardPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [editingCard, setEditingCard] = useState<Card | null>(null);
+  const socketRef = useRef<any>(null);
+
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  const socket = socketIO(
+    import.meta.env.VITE_API_URL?.replace('/api/v1', '') ?? 'http://localhost:3001',
+    { auth: { token } }
+  );
+  socketRef.current = socket;
+  socket.emit('board:join', board.id);
+
+  socket.on('card:created', ({ card }: { card: Card }) => {
+    setCards(prev => prev.find(c => c.id === card.id) ? prev : [...prev, card]);
+  });
+
+  socket.on('card:updated', ({ card }: { card: Card }) => {
+    setCards(prev => prev.map(c => c.id === card.id ? card : c));
+  });
+
+  socket.on('card:deleted', ({ cardId }: { cardId: string }) => {
+    setCards(prev => prev.filter(c => c.id !== cardId));
+  });
+
+  return () => {
+    socket.emit('board:leave', board.id);
+    socket.disconnect();
+  };
+}, [board.id]);
 
   useEffect(() => {
     api.get(`/boards/${board.id}/cards`)
