@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { api } from '../../../shared/lib/api';
 
 export interface Board {
@@ -23,12 +24,10 @@ export function BoardsPage({ user, onSelectBoard }: BoardsPageProps) {
   const [newBoardName, setNewBoardName] = useState('');
   const [newBoardDesc, setNewBoardDesc] = useState('');
   const [inviteCode, setInviteCode] = useState('');
-  const [error, setError] = useState('');
 
   useEffect(() => {
     api.get('/boards')
       .then(res => setBoards(res.data.data))
-      .catch(() => setError('Failed to load boards'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -44,8 +43,9 @@ export function BoardsPage({ user, onSelectBoard }: BoardsPageProps) {
       setNewBoardName('');
       setNewBoardDesc('');
       setShowCreate(false);
+      toast.success('Board created successfully!');
     } catch {
-      setError('Failed to create board');
+      // Handled by global interceptor
     }
   };
 
@@ -56,8 +56,9 @@ export function BoardsPage({ user, onSelectBoard }: BoardsPageProps) {
       setBoards(prev => [...prev, res.data.data]);
       setInviteCode('');
       setShowJoin(false);
+      toast.success('Joined board successfully!');
     } catch {
-      setError('Invalid invite code');
+      // Handled by global interceptor
     }
   };
 
@@ -85,12 +86,6 @@ export function BoardsPage({ user, onSelectBoard }: BoardsPageProps) {
           </button>
         </div>
       </div>
-
-      {error && (
-        <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
-          {error}
-        </p>
-      )}
 
       {/* Create board form */}
       {showCreate && (

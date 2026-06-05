@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 import { useAuth } from './shared/hooks/useAuth';
 import { AuthPage } from './features/auth/components/AuthPage';
 import { BoardsPage } from './features/boards/components/BoardsPage';
 import type { Board } from './features/boards/components/BoardsPage';
 import { BoardView } from './features/boards/components/BoardView';
+import { LoadingSpinner } from './shared/components/LoadingSpinner';
 
 export default function App() {
   const { user, loading, logout } = useAuth();
@@ -12,7 +14,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-sm text-slate-400">Loading...</div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -23,6 +25,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <Toaster position="top-right" />
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
         <button
           onClick={() => setSelectedBoard(null)}
