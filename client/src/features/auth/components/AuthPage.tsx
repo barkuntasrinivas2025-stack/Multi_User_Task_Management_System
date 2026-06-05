@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '../../../shared/hooks/useAuth';
 
 interface AuthPageProps {
@@ -11,22 +12,22 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
     try {
       if (mode === 'login') {
         await login(email, password);
+        toast.success('Welcome back!');
       } else {
         await register(email, password, name);
+        toast.success('Account created successfully!');
       }
       onSuccess();
     } catch (err: any) {
-      setError(err.response?.data?.error ?? 'Something went wrong');
+      // Errors are handled by the global API interceptor
     } finally {
       setLoading(false);
     }
@@ -44,7 +45,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
-            <div>
+            <div >
               <label className="block text-xs font-medium text-slate-600 mb-1">Name</label>
               <input
                 type="text"
@@ -57,7 +58,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             </div>
           )}
 
-          <div>
+          <div >
             <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
             <input
               type="email"
@@ -69,7 +70,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             />
           </div>
 
-          <div>
+          <div >
             <label className="block text-xs font-medium text-slate-600 mb-1">Password</label>
             <input
               type="password"
@@ -81,12 +82,6 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-
-          {error && (
-            <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          )}
 
           <button
             type="submit"
@@ -100,7 +95,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
         <p className="text-center text-xs text-slate-400 mt-4">
           {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
           <button
-            onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}
+            onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); }}
             className="text-indigo-600 font-medium hover:underline"
           >
             {mode === 'login' ? 'Register' : 'Sign In'}

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -12,13 +13,24 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Handle 401 globally
+// Handle errors globally
 api.interceptors.response.use(
   res => res,
   err => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+    if (err.response) {
+      const status = err.response.status;
+      if (status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        toast.error('Session expired. Please sign in again.');
+      } else if (status === 503) {
+        toast.error('Server is waking up... please wait a moment and try again.');
+      } else {
+        const errMsg = err.response.data?.error ?? 'An unexpected error occurred';
+        toast.error(errMsg);
+      }
+    } else {
+      toast.error('Network error. Please check your connection.');
     }
     return Promise.reject(err);
   }
