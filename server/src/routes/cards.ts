@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router, Response, Request } from 'express';
 import { db } from '../db';
 import { cards, boardMembers, cardActivity } from '../db/schema';
 import { eq, and, isNull } from 'drizzle-orm';
@@ -7,7 +7,6 @@ import { requireAuth, AuthRequest } from '../middleware/auth';
 const router = Router({ mergeParams: true });
 router.use(requireAuth);
 
-// ─── Verify board access ──────────────────────────────────────────────────────
 async function verifyBoardAccess(boardId: string, userId: string): Promise<boolean> {
   const [membership] = await db
     .select()
@@ -40,7 +39,7 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
 });
 
 // ─── POST /api/v1/boards/:boardId/cards ──────────────────────────────────────
-router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
+router.post('/', async (req: AuthRequest & { io?: any }, res: Response): Promise<void> => {
   try {
     const { boardId } = req.params;
     const userId = req.user!.userId;
@@ -67,13 +66,17 @@ router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
       position: Date.now().toString(),
     }).returning();
 
-    // Log activity
     await db.insert(cardActivity).values({
       cardId: card.id,
       userId,
       action: 'created',
       metadata: JSON.stringify({ title: card.title }),
     });
+
+    // Broadcast to all users on this board
+    if (req.io) {
+      req.io.to(`board:${boardId}`).emit('card:created', { card });
+    }
 
     res.status(201).json({ data: card });
   } catch (err) {
@@ -83,7 +86,7 @@ router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
 });
 
 // ─── PATCH /api/v1/boards/:boardId/cards/:cardId ─────────────────────────────
-router.patch('/:cardId', async (req: AuthRequest, res: Response): Promise<void> => {
+router.patch('/:cardId', async (req: AuthRequest & { io?: any }, res: Response): Promise<void> => {
   try {
     const { boardId, cardId } = req.params;
     const userId = req.user!.userId;
@@ -115,13 +118,17 @@ router.patch('/:cardId', async (req: AuthRequest, res: Response): Promise<void> 
       return;
     }
 
-    // Log activity
     await db.insert(cardActivity).values({
       cardId,
       userId,
       action: columnName ? `moved to ${columnName}` : 'updated',
       metadata: JSON.stringify(req.body),
     });
+
+    // Broadcast to all users on this board
+    if (req.io) {
+      req.io.to(`board:${boardId}`).emit('card:updated', { card: updated });
+    }
 
     res.json({ data: updated });
   } catch (err) {
@@ -131,7 +138,7 @@ router.patch('/:cardId', async (req: AuthRequest, res: Response): Promise<void> 
 });
 
 // ─── DELETE /api/v1/boards/:boardId/cards/:cardId ────────────────────────────
-router.delete('/:cardId', async (req: AuthRequest, res: Response): Promise<void> => {
+router.delete('/:cardId', async (req: AuthRequest & { io?: any }, res: Response): Promise<void> => {
   try {
     const { boardId, cardId } = req.params;
     const userId = req.user!.userId;
@@ -145,6 +152,11 @@ router.delete('/:cardId', async (req: AuthRequest, res: Response): Promise<void>
       .update(cards)
       .set({ deletedAt: new Date() })
       .where(and(eq(cards.id, cardId), eq(cards.boardId, boardId)));
+
+    // Broadcast deletion
+    if (req.io) {
+      req.io.to(`board:${boardId}`).emit('card:deleted', { cardId });
+    }
 
     res.status(204).send();
   } catch (err) {
