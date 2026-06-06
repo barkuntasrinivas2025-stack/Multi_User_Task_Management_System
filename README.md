@@ -28,12 +28,11 @@
 
 ## 🖼️ Visual Preview
 
-| Authentication | Workspace Dashboard | Collaborative Board |
-| :---: | :---: | :---: |
-| ![Login](./screenshots/Screenshot%202026-06-05%20101202.png) |
- ![Dashboard](./screenshots/Screenshot%202026-06-05%20102924.png) | 
- ![Board](./screenshots/Screenshot%202026-06-05%20102933.png) |
+| Login | Dashboard | Board | Edit Card |
+| :---: | :---: | :---: | :---: |
+| ![Login](./screenshots/Screenshot%202026-06-06%20100333.png) | ![Dashboard](./screenshots/Screenshot%202026-06-06%20100317.png) | ![Board](./screenshots/Screenshot%202026-06-06%20100249.png) | ![Edit Card](./screenshots/Screenshot%202026-06-06%20100306.png) |
 
+---
 ## 🌟 Core Features
 
 - **⚡ Real-time Engine**: Powered by Socket.io, enabling instantaneous state synchronization across all connected clients.
