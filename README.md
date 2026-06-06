@@ -30,11 +30,9 @@
 
 | Authentication | Workspace Dashboard | Collaborative Board |
 | :---: | :---: | :---: |
-| ![Login](./screenshots/login.png) | ![Dashboard](./screenshots/dashboard.png) | ![Board](./screenshots/board.png) |
-
-> **Note to Reviewer:** Screenshots are stored in the `/screenshots` directory.
-
----
+| ![Login](./screenshots/Screenshot%202026-06-05%20101202.png) |
+ ![Dashboard](./screenshots/Screenshot%202026-06-05%20102924.png) | 
+ ![Board](./screenshots/Screenshot%202026-06-05%20102933.png) |
 
 ## 🌟 Core Features
 
