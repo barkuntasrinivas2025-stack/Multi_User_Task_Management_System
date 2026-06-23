@@ -21,19 +21,13 @@ jest.mock('socket.io', () => {
     constructor(httpServer: any, options: any) {
       ioMock = {
         use: jest.fn((fn: any) => {
-          // Store the middleware to call later
           this._middleware = fn;
         }),
         to: (room: string) => ({
-          emit: jest.fn((event: string, data: any) => {
-            // Emit to all sockets in the room (we'll just call the listeners)
-            // For simplicity, we'll just call the stored listeners
-            // We'll keep it simple: just record that emit was called.
-          }),
+          emit: jest.fn((event: string, data: any) => {}),
         }),
         on: (event: string, callback: (socket: any) => void) => {
           if (event === 'connection') {
-            // When a connection occurs, we create a mock socket and call the callback
             const mockSocket = {
               id: 'socket-id',
               handshake: { auth: { token: 'fake-token' } },
@@ -54,9 +48,7 @@ jest.mock('socket.io', () => {
                 }
               }),
             };
-            // Call the authentication middleware
             this._middleware(mockSocket, () => {
-              // Then call the connection handler
               callback(mockSocket);
             });
           }
@@ -70,7 +62,6 @@ import { createServer } from 'http';
 import express from 'express';
 import { Server } from 'socket.io';
 
-// We'll create a test server
 let app: express.Express;
 let httpServer: any;
 let io: any;
@@ -78,13 +69,6 @@ let io: any;
 beforeAll(() => {
   app = express();
   httpServer = createServer(app);
-  // The actual io instance will be created by the mocked socket.io constructor
-  // We'll need to import the index.ts file to trigger the socket setup.
-  // However we can't import index.ts because it starts listening.
-  // Instead we'll manually replicate the socket setup from index.ts for testing.
-  // For simplicity, we'll just test the socket logic using the mocked io above.
-  // We'll skip the actual integration test and rely on unit tests of the handlers.
-  // Given time constraints, we'll mark these tests as pending.
 });
 
 afterAll(() => {
@@ -94,42 +78,15 @@ afterAll(() => {
 });
 
 describe('Socket.IO Logic', () => {
-  // We'll test the handlers by directly invoking them using the mocked socket.io
-  // Since we have access to the mocked io and the stored handlers, we can simulate.
+  // NOTE: Full integration mocking of Socket.IO connection lifecycle is
+  // scaffolded above but not yet wired into individual test bodies.
+  // Marked as todo — core auth and route behavior is already covered
+  // by auth.test.ts. These will be implemented next.
 
-  let socket: any;
-
-  beforeEach(() => {
-    // Simulate a new connection
-    // The mock socket.io constructor creates a socket and calls the connection handler.
-    // We'll need to trigger that. Instead we'll directly test the event handlers.
-    // We'll create a mock socket object and attach the handlers we captured.
-    // For simplicity, we'll skip detailed socket tests and rely on the fact that the
-    // auth and route tests cover the main functionality.
-    pending;
-  });
-
-  it('should authenticate a valid token and allow connection', () => {
-    pending;
-  });
-
-  it('should reject connection with invalid token', () => {
-    pending;
-  });
-
-  it('should handle board:join event and make socket join the room', () => {
-    pending;
-  });
-
-  it('should handle board:leave event and make socket leave the room', () => {
-    pending;
-  });
-
-  it('should broadcast card:edit:start to the room', () => {
-    pending;
-  });
-
-  it('should not broadcast card:edit:start to other rooms', () => {
-    pending;
-  });
+  it.todo('should authenticate a valid token and allow connection');
+  it.todo('should reject connection with invalid token');
+  it.todo('should handle board:join event and make socket join the room');
+  it.todo('should handle board:leave event and make socket leave the room');
+  it.todo('should broadcast card:edit:start to the room');
+  it.todo('should not broadcast card:edit:start to other rooms');
 });
