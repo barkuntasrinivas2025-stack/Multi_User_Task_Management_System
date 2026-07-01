@@ -1,4 +1,4 @@
-# 📋 Azentrix Task Board
+# 📋 Multi-User Task Management System
 <p align="center">
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
   <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
