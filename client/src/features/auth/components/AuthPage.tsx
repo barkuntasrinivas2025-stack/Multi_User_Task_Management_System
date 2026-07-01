@@ -40,7 +40,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
           {mode === 'login' ? 'Welcome back' : 'Create account'}
         </h1>
         <p className="text-sm text-slate-400 mb-6">
-          {mode === 'login' ? 'Sign in to your boards' : 'Get started with Azentrix Tasks'}
+          {mode === 'login' ? 'Sign in to your boards' : 'Get started with Task Management System'}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
