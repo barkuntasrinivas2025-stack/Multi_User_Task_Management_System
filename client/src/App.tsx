@@ -31,7 +31,7 @@ export default function App() {
           onClick={() => setSelectedBoard(null)}
           className="text-lg font-bold text-slate-800 hover:text-indigo-600 transition-colors"
         >
-          📋 Azentrix Task Board
+          📋 Multi_User_Task_Management_System
         </button>
         <div className="flex items-center gap-3">
           {selectedBoard && (
